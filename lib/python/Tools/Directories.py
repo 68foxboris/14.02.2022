@@ -139,17 +139,17 @@ def resolveFilename(scope, base="", path_prefix=None):
 		if scope in (SCOPE_CURRENT_SKIN, SCOPE_ACTIVE_SKIN):
 			# This import must be here as this module finds the config file as part of the config initialisation.
 			from Components.config import config
-			skin = os.path.dirname(config.skin.primary_skin.value)
-			path = os.path.join(path, skin)
+			skin = dirname(config.skin.primary_skin.value)
+			path = pathjoin(path, skin)
 		elif scope in (SCOPE_CURRENT_PLUGIN_ABSOLUTE, SCOPE_CURRENT_PLUGIN_RELATIVE):
-			callingCode = os.path.normpath(inspect.stack()[1][1])
-			plugins = os.path.normpath(defaultPaths[SCOPE_PLUGINS][0])
+			callingCode = normpath(inspect.stack()[1][1])
+			plugins = normpath(defaultPaths[SCOPE_PLUGINS][0])
 			path = None
 			if comparePath(plugins, callingCode):
-				pluginCode = callingCode[len(plugins) + 1:].split(os.sep)
+				pluginCode = callingCode[len(plugins) + 1:].split(sep)
 				if len(pluginCode) > 2:
-					relative = "%s%s%s" % (pluginCode[0], os.sep, pluginCode[1])
-					path = os.path.join(plugins, relative)
+					relative = "%s%s%s" % (pluginCode[0], sep, pluginCode[1])
+					path = pathjoin(plugins, relative)
 	elif scope in (SCOPE_CURRENT_SKIN, SCOPE_ACTIVE_SKIN):
 		global skinResolveList
 		if not skinResolveList:
@@ -157,11 +157,11 @@ def resolveFilename(scope, base="", path_prefix=None):
 			from Components.config import config
 			skin = os.path.dirname(config.skin.primary_skin.value)
 			skinResolveList = addInList(
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], skin),
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], "skin_common"),
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], skin),
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], "skin_common"),
 					defaultPaths[SCOPE_CONFIG][0],
-					os.path.join(defaultPaths[SCOPE_SKIN][0], skin),
-					os.path.join(defaultPaths[SCOPE_SKIN][0], "skin_default"),
+					pathjoin(defaultPaths[SCOPE_SKIN][0], skin),
+					pathjoin(defaultPaths[SCOPE_SKIN][0], "skin_default"),
 					defaultPaths[SCOPE_SKIN][0]
 				)
 		file = itemExists(skinResolveList, base)
@@ -173,15 +173,15 @@ def resolveFilename(scope, base="", path_prefix=None):
 			# This import must be here as this module finds the config file as part of the config initialisation.
 			from Components.config import config
 			if hasattr(config.skin, "display_skin"):
-				skin = os.path.dirname(config.skin.display_skin.value)
+				skin = dirname(config.skin.display_skin.value)
 			else:
 				skin = ""
 			lcdskinResolveList = addInList(
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], "display", skin),
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], "display", "skin_common"),
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], "display", skin),
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], "display", "skin_common"),
 					defaultPaths[SCOPE_CONFIG][0],
-					os.path.join(defaultPaths[SCOPE_LCDSKIN][0], skin),
-					os.path.join(defaultPaths[SCOPE_LCDSKIN][0], "skin_default"),
+					pathjoin(defaultPaths[SCOPE_LCDSKIN][0], skin),
+					pathjoin(defaultPaths[SCOPE_LCDSKIN][0], "skin_default"),
 					defaultPaths[SCOPE_LCDSKIN][0]
 				)
 		file = itemExists(lcdskinResolveList, base)
@@ -192,53 +192,53 @@ def resolveFilename(scope, base="", path_prefix=None):
 		if not fontsResolveList:
 			# This import must be here as this module finds the config file as part of the config initialisation.
 			from Components.config import config
-			skin = os.path.dirname(config.skin.primary_skin.value)
-			display = os.path.dirname(config.skin.display_skin.value) if hasattr(config.skin, "display_skin") else None
+			skin = dirname(config.skin.primary_skin.value)
+			display = dirname(config.skin.display_skin.value) if hasattr(config.skin, "display_skin") else None
 			fontsResolveList = addInList(
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], "fonts"),
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], skin, "fonts"),
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], skin)
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], "fonts"),
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], skin, "fonts"),
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], skin)
 				)
 			if display:
 				fontsResolveList += addInList(os.path.join(defaultPaths[SCOPE_CONFIG][0], "display", display))
 			fontsResolveList += addInList(
-					os.path.join(defaultPaths[SCOPE_CONFIG][0], "skin_common"),
+					pathjoin(defaultPaths[SCOPE_CONFIG][0], "skin_common"),
 					defaultPaths[SCOPE_CONFIG][0],
-					os.path.join(defaultPaths[SCOPE_SKIN][0], skin, "fonts"),
-					os.path.join(defaultPaths[SCOPE_SKIN][0], skin),
-					os.path.join(defaultPaths[SCOPE_SKIN][0], "skin_default", "fonts"),
-					os.path.join(defaultPaths[SCOPE_SKIN][0], "skin_default")
+					pathjoin(defaultPaths[SCOPE_SKIN][0], skin, "fonts"),
+					pathjoin(defaultPaths[SCOPE_SKIN][0], skin),
+					pathjoin(defaultPaths[SCOPE_SKIN][0], "skin_default", "fonts"),
+					pathjoin(defaultPaths[SCOPE_SKIN][0], "skin_default")
 				)
 			if display:
 				fontsResolveList += addInList(os.path.join(defaultPaths[SCOPE_LCDSKIN][0], display))
 			fontsResolveList += addInList(
-					os.path.join(defaultPaths[SCOPE_LCDSKIN][0], "skin_default"),
+					pathjoin(defaultPaths[SCOPE_LCDSKIN][0], "skin_default"),
 					defaultPaths[SCOPE_FONTS][0]
 				)
 		for item in fontsResolveList:
-			file = os.path.join(item, base)
+			file = pathjoin(item, base)
 			if pathExists(file):
 				path = file
 				break
 	elif scope == SCOPE_CURRENT_PLUGIN:
-		file = os.path.join(defaultPaths[SCOPE_PLUGINS][0], base)
+		file = pathjoin(defaultPaths[SCOPE_PLUGINS][0], base)
 		if pathExists(file):
 			path = file
 	elif scope in (SCOPE_CURRENT_PLUGIN_ABSOLUTE, SCOPE_CURRENT_PLUGIN_RELATIVE):
-		callingCode = os.path.normpath(inspect.stack()[1][1])
-		plugins = os.path.normpath(defaultPaths[SCOPE_PLUGINS][0])
+		callingCode = normpath(inspect.stack()[1][1])
+		plugins = normpath(defaultPaths[SCOPE_PLUGINS][0])
 		path = None
 		if comparePath(plugins, callingCode):
-			pluginCode = callingCode[len(plugins) + 1:].split(os.sep)
+			pluginCode = callingCode[len(plugins) + 1:].split(sep)
 			if len(pluginCode) > 2:
 				relative = os.path.join("%s%s%s" % (pluginCode[0], os.sep, pluginCode[1]), base)
 				path = os.path.join(plugins, relative)
 	else:
 		path, flags = defaultPaths.get(scope)
-		path = os.path.join(path, base)
-	path = os.path.normpath(path)
+		path = pathjoin(path, base)
+	path = normpath(path)
 	# If the path is a directory then ensure that it ends with a "/".
-	if os.path.isdir(path) and not path.endswith("/"):
+	if isdir(path) and not path.endswith("/"):
 		path += "/"
 	if scope == SCOPE_CURRENT_PLUGIN_RELATIVE:
 		path = path[len(plugins) + 1:]
