@@ -106,6 +106,7 @@ class About(Screen):
 		AboutText += FFmpegVersion + "\n"
 
 		AboutText += "\n"
+		AboutText += _("OpenSSL version: ") + about.getOpenSSLVersion() + "\n"
 		AboutText += _("Python version: ") + about.getPythonVersionString() + "\n"
 		AboutText += _("GCC version: ") + about.getGccVersion() + "\n"
 		AboutText += _("Glibc version: ") + about.getGlibcVersion() + "\n"
