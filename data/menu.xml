@@ -49,6 +49,7 @@
 					<item level="0" entryID="av_setup"><setup id="avsetup"/></item>
 					<item entryID="subtitle_setup" level="2" text="Subtitle Setup" weight="20"><setup id="subtitlesetup" /></item>
 					<item level="0" entryID="autolanguage_setup" text="Auto Language Setup"><setup id="autolanguagesetup"/></item>
+				</menu>
 				<item level="0" entryID="usage_setup"><setup id="usage"/></item>
 				<menu level="0" text="GUI Settings" entryID="gui_settings">
 					<id val="gui"/>
