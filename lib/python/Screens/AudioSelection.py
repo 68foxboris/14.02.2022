@@ -34,6 +34,8 @@ class AudioSelection(ConfigListScreen, Screen):
 		self.infobar = infobar or self.session.infobar
 		if not hasattr(self.infobar, "selected_subtitle"):
 			self.infobar.selected_subtitle = None
+		if not hasattr(self.infobar, "selected_subtitle"):
+			self.infobar.selected_subtitle = None
 
 		self.__event_tracker = ServiceEventTracker(screen=self, eventmap={
 				iPlayableService.evUpdatedInfo: self.__updatedInfo
