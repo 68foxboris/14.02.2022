@@ -277,7 +277,11 @@ class InfoBarShowHide(InfoBarScreenSaver):
 		InfoBarScreenSaver.__init__(self)
 		self.__state = self.STATE_SHOWN
 		self.__locked = 0
-
+		if SystemInfo["CanFadeOut"]:
+			self.DimmingTimer = eTimer()
+			self.DimmingTimer.callback.append(self.doDimming)
+			self.unDimmingTimer = eTimer()
+			self.unDimmingTimer.callback.append(self.unDimming)
 		self.hideTimer = eTimer()
 		self.hideTimer.callback.append(self.doTimerHide)
 		self.hideTimer.start(5000, True)
@@ -301,7 +305,8 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			InfoBarInstance.hideVBILineScreen.hide()
 		self.hideVBILineScreen = self.session.instantiateDialog(HideVBILine)
 		self.hideVBILineScreen.show()
-
+		if SystemInfo["CanFadeOut"]:
+			self.lastResetAlpha = True
 		self.onLayoutFinish.append(self.__layoutFinished)
 		self.onExecBegin.append(self.__onExecBegin)
 
@@ -322,16 +327,15 @@ class InfoBarShowHide(InfoBarScreenSaver):
 
 	def __onHide(self):
 		self.__state = self.STATE_HIDDEN
+		if SystemInfo["CanFadeOut"]:
+			self.resetAlpha()
 		if self.actualSecondInfoBarScreen:
 			self.actualSecondInfoBarScreen.hide()
-		self.resetAlpha()
 		for x in self.onShowHideNotifiers:
 			x(False)
         
 	def resetAlpha(self):
-		if config.usage.show_infobar_do_dimming.value:
-			self.unDimmingTimer = eTimer()
-			self.unDimmingTimer.callback.append(self.unDimming)
+		if config.usage.show_infobar_do_dimming.value and self.lastResetAlpha is False:
 			self.unDimmingTimer.start(300, True)
 	
 	def doDimming(self):
@@ -347,11 +351,14 @@ class InfoBarShowHide(InfoBarScreenSaver):
 		self.doWriteAlpha(config.av.osd_alpha.value)
 
 	def doWriteAlpha(self, value):
-		if fileExists("/proc/stb/video/alpha"):
-			f=open("/proc/stb/video/alpha","w")
-			f.write("%i" % (value))
-			f.close()
-			
+		if SystemInfo["CanChangeOsdAlpha"]:
+#			print("[InfoBarGenerics] Write to /proc/stb/video/alpha")
+			open("/proc/stb/video/alpha", "w").write(str(value))
+			if value == config.av.osd_alpha.value:
+				self.lastResetAlpha = True
+			else:
+				self.lastResetAlpha = False
+
 	def toggleShowLong(self):
 		if not config.usage.ok_is_channelselection.value:
 			self.toggleSecondInfoBar()
@@ -409,14 +416,19 @@ class InfoBarShowHide(InfoBarScreenSaver):
 
 	def doShow(self):
 		self.show()
+		if SystemInfo["CanFadeOut"]:
+			self.hideTimer.stop()
+			self.DimmingTimer.stop()
 		self.startHideTimer()
 
 	def doTimerHide(self):
 		self.hideTimer.stop()
-		self.DimmingTimer = eTimer()
-		self.DimmingTimer.callback.append(self.doDimming)
-		self.DimmingTimer.start(70, True)
-		self.dimmed = config.usage.show_infobar_dimming_speed.value
+		if SystemInfo["CanFadeOut"]:
+			self.DimmingTimer.start(70, True)
+			self.dimmed = config.usage.show_infobar_dimming_speed.value
+		else:
+			if self.__state == self.STATE_SHOWN:
+				self.hide()
 
 	def doHide(self):
 		if self.__state != self.STATE_HIDDEN:
@@ -468,7 +480,17 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			self.hideTimer.stop()
 
 	def unlockShow(self):
-		self.__locked -= 1
+		if SystemInfo["CanFadeOut"]:
+			if config.usage.show_infobar_do_dimming.value and self.lastResetAlpha is False:
+				self.doWriteAlpha(config.av.osd_alpha.value)
+			try:
+				self.__locked -= 1
+			except:
+				self.__locked = 0
+			if self.__locked < 0:
+				self.__locked = 0
+		else:
+			self.__locked -= 1
 		if self.execing:
 			self.startHideTimer()
 
@@ -1799,6 +1821,12 @@ class InfoBarPVRState:
 	def _mayShow(self):
 		if self.shown and self.seekstate != self.SEEK_STATE_PLAY:
 			self.pvrStateDialog.show()
+		if SystemInfo["CanFadeOut"]:
+			if self.shown and self.seekstate != self.SEEK_STATE_EOF:
+				self.DimmingTimer.stop()
+				self.doWriteAlpha(config.av.osd_alpha.value)
+				self.pvrStateDialog.show()
+				self.startHideTimer()
 
 	def __playStateChanged(self, state):
 		playstateString = state[3]
@@ -3840,6 +3868,44 @@ class InfoBarPowersaver:
 		if not Screens.Standby.inStandby:
 			print "[InfoBarGenerics] InfoBarPowersaver goto standby"
 			self.session.open(Screens.Standby.Standby)
+
+class InfoBarZoom:
+	def __init__(self):
+		self.zoomrate = 0
+		self.zoomin = 1
+
+		self["ZoomActions"] = HelpableActionMap(self, ["InfobarZoomActions"], {
+			"ZoomInOut": (self.ZoomInOut, _("Zoom In/Out TV...")),
+			"ZoomOff": (self.ZoomOff, _("Zoom Off...")),
+		}, prio=2, description=_("Zoom Actions"))
+
+	def ZoomInOut(self):
+		zoomval = 0
+		if self.zoomrate > 3:
+			self.zoomin = 0
+		elif self.zoomrate < -9:
+			self.zoomin = 1
+
+		if self.zoomin == 1:
+			self.zoomrate += 1
+		else:
+			self.zoomrate -= 1
+
+		if self.zoomrate < 0:
+			zoomval = abs(self.zoomrate) + 10
+		else:
+			zoomval = self.zoomrate
+
+		if fileExists("/proc/stb/vmpeg/0/zoomrate"):
+			print("[InfoBarGenerics] Write to /proc/stb/vmpeg/0/zoomrate")
+			open("/proc/stb/vmpeg/0/zoomrate", "w").write(int(zoomval))
+
+	def ZoomOff(self):
+		self.zoomrate = 0
+		self.zoomin = 1
+		if fileExists("/proc/stb/vmpeg/0/zoomrate"):
+			print("[InfoBarGenerics] Write to /proc/stb/vmpeg/0/zoomrate")
+			open("/proc/stb/vmpeg/0/zoomrate", "w").write(str(0))
 
 
 class InfoBarHDMI:
