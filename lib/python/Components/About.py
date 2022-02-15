@@ -4,7 +4,10 @@ import os
 import time
 import re
 from Tools.HardwareInfo import HardwareInfo
+from SystemInfo import SystemInfo
+from Tools.Directories import fileReadLine
 
+MODULE_NAME = __name__.split(".")[-1]
 
 def getVersionString():
 	return getImageVersionString()
