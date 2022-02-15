@@ -53,6 +53,8 @@ from RecordTimer import RecordTimerEntry, RecordTimer, findSafeRecordPath
 # hack alert!
 from Menu import MainMenu, mdom
 
+MODULE_NAME = __name__.split(".")[-1]
+
 model = BoxInfo.getItem("model")
 brand = BoxInfo.getItem("brand")
 platform = BoxInfo.getItem("platform")
@@ -278,7 +280,11 @@ class InfoBarShowHide(InfoBarScreenSaver):
 		InfoBarScreenSaver.__init__(self)
 		self.__state = self.STATE_SHOWN
 		self.__locked = 0
-
+		if config.usage.fadeout.value is True:
+			self.DimmingTimer = eTimer()
+			self.DimmingTimer.callback.append(self.doDimming)
+			self.unDimmingTimer = eTimer()
+			self.unDimmingTimer.callback.append(self.unDimming)
 		self.hideTimer = eTimer()
 		self.hideTimer.callback.append(self.doTimerHide)
 		self.hideTimer.start(5000, True)
@@ -302,7 +308,8 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			InfoBarInstance.hideVBILineScreen.hide()
 		self.hideVBILineScreen = self.session.instantiateDialog(HideVBILine)
 		self.hideVBILineScreen.show()
-
+		if config.usage.fadeout.value is True:
+			self.lastResetAlpha = True
 		self.onLayoutFinish.append(self.__layoutFinished)
 		self.onExecBegin.append(self.__onExecBegin)
 
@@ -323,16 +330,15 @@ class InfoBarShowHide(InfoBarScreenSaver):
 
 	def __onHide(self):
 		self.__state = self.STATE_HIDDEN
+		if config.usage.fadeout.value is True:
+			self.resetAlpha()
 		if self.actualSecondInfoBarScreen:
 			self.actualSecondInfoBarScreen.hide()
-		self.resetAlpha()
 		for x in self.onShowHideNotifiers:
 			x(False)
         
 	def resetAlpha(self):
-		if config.usage.show_infobar_do_dimming.value:
-			self.unDimmingTimer = eTimer()
-			self.unDimmingTimer.callback.append(self.unDimming)
+		if config.usage.show_infobar_do_dimming.value and self.lastResetAlpha is False:
 			self.unDimmingTimer.start(300, True)
 	
 	def doDimming(self):
@@ -348,11 +354,14 @@ class InfoBarShowHide(InfoBarScreenSaver):
 		self.doWriteAlpha(config.av.osd_alpha.value)
 
 	def doWriteAlpha(self, value):
-		if fileExists("/proc/stb/video/alpha"):
-			f=open("/proc/stb/video/alpha","w")
-			f.write("%i" % (value))
-			f.close()
-			
+		if BoxInfo.getItem("CanChangeOsdAlpha"):
+#			print("[InfoBarGenerics] Write to /proc/stb/video/alpha")
+			open("/proc/stb/video/alpha", "w").write(str(value))
+			if value == config.av.osd_alpha.value:
+				self.lastResetAlpha = True
+			else:
+				self.lastResetAlpha = False
+
 	def toggleShowLong(self):
 		if not config.usage.ok_is_channelselection.value:
 			self.toggleSecondInfoBar()
@@ -410,14 +419,21 @@ class InfoBarShowHide(InfoBarScreenSaver):
 
 	def doShow(self):
 		self.show()
+		if config.usage.fadeout.value is True:
+			self.hideTimer.stop()
+			self.DimmingTimer.stop()
+			if BoxInfo.getItem("socfamily").startswith("bcm"):
+				self.doWriteAlpha(config.av.osd_alpha.value)
 		self.startHideTimer()
 
 	def doTimerHide(self):
 		self.hideTimer.stop()
-		self.DimmingTimer = eTimer()
-		self.DimmingTimer.callback.append(self.doDimming)
-		self.DimmingTimer.start(70, True)
-		self.dimmed = config.usage.show_infobar_dimming_speed.value
+		if config.usage.fadeout.value is True:
+			self.DimmingTimer.start(70, True)
+			self.dimmed = config.usage.show_infobar_dimming_speed.value
+		else:
+			if self.__state == self.STATE_SHOWN:
+				self.hide()
 
 	def doHide(self):
 		if self.__state != self.STATE_HIDDEN:
@@ -469,7 +485,17 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			self.hideTimer.stop()
 
 	def unlockShow(self):
-		self.__locked -= 1
+		if config.usage.fadeout.value is True:
+			if config.usage.show_infobar_do_dimming.value and self.lastResetAlpha is False:
+				self.doWriteAlpha(config.av.osd_alpha.value)
+			try:
+				self.__locked -= 1
+			except:
+				self.__locked = 0
+			if self.__locked < 0:
+				self.__locked = 0
+		else:
+			self.__locked -= 1
 		if self.execing:
 			self.startHideTimer()
 
@@ -1792,6 +1818,12 @@ class InfoBarPVRState:
 	def _mayShow(self):
 		if self.shown and self.seekstate != self.SEEK_STATE_PLAY:
 			self.pvrStateDialog.show()
+		if config.usage.fadeout.value is True:
+			if self.shown and self.seekstate != self.SEEK_STATE_EOF:
+				self.DimmingTimer.stop()
+				self.doWriteAlpha(config.av.osd_alpha.value)
+				self.pvrStateDialog.show()
+				self.startHideTimer()
 
 	def __playStateChanged(self, state):
 		playstateString = state[3]
@@ -2429,6 +2461,10 @@ class InfoBarPiP:
 					if lastPiPServiceTimeout:
 						self.lastPiPServiceTimeoutTimer.startLongTimer(lastPiPServiceTimeout)
 				del self.session.pip
+				if BoxInfo.getItem("LCDMiniTV") and int(config.lcd.modepip.value) >= 1:
+					print('[InfoBarGenerics] LCDMiniTV disable PIP')
+					print("[InfoBarGenerics] Write to /proc/stb/lcd/mode")
+					open("/proc/stb/lcd/mode", "w").write(config.lcd.modeminitv.value)
 				self.session.pipshown = False
 			if hasattr(self, "ScreenSaverTimerStart"):
 				self.ScreenSaverTimerStart()
@@ -2439,11 +2475,31 @@ class InfoBarPiP:
 			if self.session.pip.playService(newservice):
 				self.session.pipshown = True
 				self.session.pip.servicePath = slist and slist.getCurrentServicePath()
+				if BoxInfo.getItem("LCDMiniTVPiP") and int(config.lcd.modepip.value) >= 1:
+					print('[InfoBarGenerics] LCDMiniTV enable PIP')
+					print("[InfoBarGenerics] Write to /proc/stb/lcd/mode")
+					open("/proc/stb/lcd/mode", "w").write(config.lcd.modepip.value)
+					print("[InfoBarGenerics] Write to /proc/stb/vmpeg/1/dst_width")
+					open("/proc/stb/vmpeg/1/dst_width", "w").write("0")
+					print("[InfoBarGenerics] Write to /proc/stb/vmpeg/1/dst_height")
+					open("/proc/stb/vmpeg/1/dst_height", "w").write("0")
+					print("[InfoBarGenerics] Write to /proc/stb/vmpeg/1/dst_apply")
+					open("/proc/stb/vmpeg/1/dst_apply", "w").write("1")
 			else:
 				newservice = self.session.nav.getCurrentlyPlayingServiceOrGroup() or (slist and slist.servicelist.getCurrent())
 				if self.session.pip.playService(newservice):
 					self.session.pipshown = True
 					self.session.pip.servicePath = slist and slist.getCurrentServicePath()
+					if BoxInfo.getItem("LCDMiniTVPiP") and int(config.lcd.modepip.value) >= 1:
+						print('[InfoBarGenerics] LCDMiniTV enable PIP')
+						print("[InfoBarGenerics] Write to /proc/stb/lcd/mode")
+						open("/proc/stb/lcd/mode", "w").write(config.lcd.modepip.value)
+						print("[InfoBarGenerics] Write to /proc/stb/vmpeg/1/dst_width")
+						open("/proc/stb/vmpeg/1/dst_width", "w").write("0")
+						print("[InfoBarGenerics] Write to /proc/stb/vmpeg/1/dst_height")
+						open("/proc/stb/vmpeg/1/dst_height", "w").write("0")
+						print("[InfoBarGenerics] Write to /proc/stb/vmpeg/1/dst_apply")
+						open("/proc/stb/vmpeg/1/dst_apply", "w").write("1")
 				else:
 					self.session.pipshown = False
 					del self.session.pip
@@ -3833,7 +3889,7 @@ class InfoBarZoom:
 			}, prio=2)
 
 	def ZoomInOut(self):
-		zoomval=0
+		zoomval = 0
 		if self.zoomrate > 3:
 			self.zoomin = 0
 		elif self.zoomrate < -9:
@@ -3845,9 +3901,9 @@ class InfoBarZoom:
 			self.zoomrate -= 1
 
 		if self.zoomrate < 0:
-			zoomval=abs(self.zoomrate)+10
+			zoomval = abs(self.zoomrate) + 10
 		else:
-			zoomval=self.zoomrate
+			zoomval = self.zoomrate
 
 		if fileExists("/proc/stb/vmpeg/0/zoomrate"):
 			open("/proc/stb/vmpeg/0/zoomrate", "w").write(int(zoomval))
