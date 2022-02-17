@@ -5,7 +5,7 @@ from Components.config import config, ConfigSlider, ConfigSelection, ConfigYesNo
 from enigma import eAVSwitch, eDVBVolumecontrol, getDesktop
 from Components.SystemInfo import BoxInfo
 import os
-from boxbranding import getBoxType, getBoxBrand
+from boxbranding import getBoxType, getBrandOEM
 
 model = BoxInfo.getItem("model")
 platform = BoxInfo.getItem("platform")

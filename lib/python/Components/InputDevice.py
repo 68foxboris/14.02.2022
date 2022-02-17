@@ -2,7 +2,7 @@ from fcntl import ioctl
 from os import O_NONBLOCK, O_RDWR, close as osclose, listdir, open as osopen, write as oswrite
 from os.path import isdir, isfile
 from platform import machine
-from boxbranding import getBoxType, getBoxBrand
+from boxbranding import getBoxType, getBrandOEM
 from struct import pack
 
 from enigma import eRCInput
@@ -303,7 +303,7 @@ class RemoteControl:
 		return None
 
 	def readRemoteControlType(self):
-		return fileReadLine("/proc/stb/ir/rc/type", "-1", source=MODULE_NAME)
+		return fileReadLine("/proc/stb/ir/rc/type", "0", source=MODULE_NAME)
 
 	def writeRemoteControlType(self, rcType):
 		if rcType > 0:
@@ -400,8 +400,9 @@ iInputDevices = inputDevices # Deprecated support old plugins
 
 class RcTypeControl():
 	def __init__(self):
-		if pathExists('/proc/stb/ir/rc/type') and getBoxBrand() not in ('gigablue', 'odin', 'ini', 'entwopia', 'tripledot'):
+		if pathExists('/proc/stb/ir/rc/type') and getBrandOEM() not in ('gigablue', 'odin', 'ini', 'entwopia', 'tripledot'):
 			self.isSupported = True
+
 			if config.plugins.remotecontroltype.rctype.value != 0:
 				self.writeRcType(config.plugins.remotecontroltype.rctype.value)
 		else:

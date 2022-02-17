@@ -9,8 +9,7 @@ from Components.ConfigList import ConfigListScreen
 from Components.ActionMap import ActionMap, HelpableActionMap
 from Tools.Directories import resolveFilename, SCOPE_GUISKIN
 from Tools.LoadPixmap import LoadPixmap
-from boxbranding import getRCType
-from boxbranding import getBoxType, getBoxBrand
+from boxbranding import getBoxType, getMachineBrand, getMachineName, getBrandOEM
 
 
 class InputDeviceSelection(HelpableScreen, Screen):
