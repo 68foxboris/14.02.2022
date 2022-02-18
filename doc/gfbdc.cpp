@@ -158,7 +158,17 @@ void gFBDC::exec(const gOpcode *o)
 		break;
 	}
 	case gOpcode::flush:
-		fb->blit();
+#if defined(CONFIG_HISILICON_FB)
+#include <lib/gdi/grc.h>
+
+extern void bcm_accel_blit(
+		int src_addr, int src_width, int src_height, int src_stride, int src_format,
+		int dst_addr, int dst_width, int dst_height, int dst_stride,
+		int src_x, int src_y, int width, int height,
+		int dst_x, int dst_y, int dwidth, int dheight,
+		int pal_addr, int flags);
+#endif
+
 
 #ifdef CONFIG_ION
 		if (surface_back.data_phys)
