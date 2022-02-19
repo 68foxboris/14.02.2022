@@ -116,7 +116,10 @@ def InitUsageConfig():
 	config.usage.show_infobar_on_event_change = ConfigYesNo(default=False)
 	config.usage.show_second_infobar = ConfigSelection(default="0", choices=[("", _("None"))] + choicelist + [("EPG", _("EPG"))])
 	config.usage.show_simple_second_infobar = ConfigYesNo(default=False)
-	config.usage.infobar_frontend_source = ConfigSelection(default="settings", choices=[("settings", _("Settings")), ("tuner", _("Tuner"))])
+	config.usage.infobar_frontend_source = ConfigSelection(default="settings", choices=[
+		("settings", _("Settings")),
+		("tuner", _("Tuner"))
+	])
 	config.usage.oldstyle_zap_controls = ConfigYesNo(default=False)
 	config.usage.oldstyle_channel_select_controls = ConfigYesNo(default=False)
 	config.usage.zap_with_ch_buttons = ConfigYesNo(default=False)
@@ -126,40 +129,110 @@ def InitUsageConfig():
 	config.usage.channelselection_preview = ConfigYesNo(default=False)
 	config.usage.show_spinner = ConfigYesNo(default=True)
 	config.usage.menu_sort_weight = ConfigDictionarySet(default={"mainmenu": {"submenu": {}}})
-	config.usage.menu_sort_mode = ConfigSelection(default="default", choices=[("a_z", _("alphabetical")), ("default", _("Default")), ("user", _("user defined")), ("user_hidden", _("user defined hidden"))])
+	config.usage.menu_sort_mode = ConfigSelection(default="default", choices=[
+		("a_z", _("Alphabetical")),
+		("default", _("Default")),
+		("user", _("User defined")),
+		("user_hidden", _("User defined hidden"))
+	])
 	config.usage.show_genre_info = ConfigYesNo(default=False)
-	config.usage.menu_show_numbers = ConfigSelection(default="no", choices=[("no", _("no")), ("menu&plugins", _("in menu and plugins")), ("menu", _("in menu only")), ("plugins", _("in plugins only"))])
-	config.usage.showScreenPath = ConfigSelection(default="small", choices=[("off", _("Disabled")), ("small", _("Small")), ("large", _("Large"))])
+	config.usage.menu_show_numbers = ConfigSelection(default="no", choices=[
+		("no", _("No")),
+		("menu&plugins", _("In menu and plugins")),
+		("menu", _("In menu only")),
+		("plugins", _("In plugins only"))
+	])
+	config.usage.showScreenPath = ConfigSelection(default="small", choices=[
+		("off", _("Disabled")),
+		("small", _("Small")),
+		("large", _("Large"))
+	])
 	config.usage.enable_tt_caching = ConfigYesNo(default=True)
 
-	config.usage.tuxtxt_font_and_res = ConfigSelection(default="TTF_SD", choices=[("X11_SD", _("Fixed X11 font (SD)")), ("TTF_SD", _("TrueType font (SD)")), ("TTF_HD", _("TrueType font (HD)")), ("TTF_FHD", _("TrueType font (full-HD)")), ("expert_mode", _("Expert mode"))])
-	config.usage.tuxtxt_UseTTF = ConfigSelection(default="1", choices=[("0", "0"), ("1", "1")])
-	config.usage.tuxtxt_TTFBold = ConfigSelection(default="1", choices=[("0", "0"), ("1", "1")])
-	config.usage.tuxtxt_TTFScreenResX = ConfigSelection(default="720", choices=[("720", "720"), ("1280", "1280"), ("1920", "1920")])
+	config.usage.tuxtxt_font_and_res = ConfigSelection(default="TTF_SD", choices=[
+		("X11_SD", _("Fixed X11 font (SD)")),
+		("TTF_SD", _("TrueType font (SD)")),
+		("TTF_HD", _("TrueType font (HD)")),
+		("TTF_FHD", _("TrueType font (Full-HD)")),
+		("expert_mode", _("Expert mode"))
+	])
+	config.usage.tuxtxt_UseTTF = ConfigSelection(default="1", choices=[
+		("0", _("0")),
+		("1", _("1"))
+	])
+	config.usage.tuxtxt_TTFBold = ConfigSelection(default="1", choices=[
+		("0", _("0")),
+		("1", _("1"))
+	])
+	config.usage.tuxtxt_TTFScreenResX = ConfigSelection(default="720", choices=[
+		("720", _("720")),
+		("1280", _("1280")),
+		("1920", _("1920"))
+	])
 	config.usage.tuxtxt_StartX = ConfigInteger(default=50, limits=(0, 200))
 	config.usage.tuxtxt_EndX = ConfigInteger(default=670, limits=(500, 1920))
 	config.usage.tuxtxt_StartY = ConfigInteger(default=30, limits=(0, 200))
 	config.usage.tuxtxt_EndY = ConfigInteger(default=555, limits=(400, 1080))
-	config.usage.tuxtxt_TTFShiftY = ConfigSelection(default="2", choices=[("-9", "-9"), ("-8", "-8"), ("-7", "-7"), ("-6", "-6"), ("-5", "-5"), ("-4", "-4"), ("-3", "-3"), ("-2", "-2"), ("-1", "-1"), ("0", "0"), ("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5"), ("6", "6"), ("7", "7"), ("8", "8"), ("9", "9")])
-	config.usage.tuxtxt_TTFShiftX = ConfigSelection(default="0", choices=[("-9", "-9"), ("-8", "-8"), ("-7", "-7"), ("-6", "-6"), ("-5", "-5"), ("-4", "-4"), ("-3", "-3"), ("-2", "-2"), ("-1", "-1"), ("0", "0"), ("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5"), ("6", "6"), ("7", "7"), ("8", "8"), ("9", "9")])
+	config.usage.tuxtxt_TTFShiftY = ConfigSelection(default="2", choices=[
+		("-9", _("-9")),
+		("-8", _("-8")),
+		("-7", _("-7")),
+		("-6", _("-6")),
+		("-5", _("-5")),
+		("-4", _("-4")),
+		("-3", _("-3")),
+		("-2", _("-2")),
+		("-1", _("-1")),
+		("0", _("0")),
+		("1", _("1")),
+		("2", _("2")),
+		("3", _("3")),
+		("4", _("4")),
+		("5", _("5")),
+		("6", _("6")),
+		("7", _("7")),
+		("8", _("8")),
+		("9", _("9"))
+	])
+	config.usage.tuxtxt_TTFShiftX = ConfigSelection(default="0", choices=[
+		("-9", _("-9")),
+		("-8", _("-8")),
+		("-7", _("-7")),
+		("-6", _("-6")),
+		("-4", _("-4")),
+			("-5", _("-5")),
+	("-3", _("-3")),
+		("-2", _("-2")),
+		("-1", _("-1")),
+		("0", _("0")),
+		("1", _("1")),
+		("2", _("2")),
+		("3", _("3")),
+		("4", _("4")),
+		("5", _("5")),
+		("6", _("6")),
+		("7", _("7")),
+		("8", _("8")),
+		("9", _("9"))
+	])
 	config.usage.tuxtxt_TTFWidthFactor16 = ConfigInteger(default=29, limits=(8, 31))
 	config.usage.tuxtxt_TTFHeightFactor16 = ConfigInteger(default=14, limits=(8, 31))
 	config.usage.tuxtxt_CleanAlgo = ConfigInteger(default=0, limits=(0, 9))
 	config.usage.tuxtxt_ConfFileHasBeenPatched = NoSave(ConfigYesNo(default=False))
 
-	config.usage.tuxtxt_font_and_res.addNotifier(patchTuxtxtConfFile, initial_call = False, immediate_feedback = False)
-	config.usage.tuxtxt_UseTTF.addNotifier(patchTuxtxtConfFile, initial_call = False, immediate_feedback = False)
-	config.usage.tuxtxt_TTFBold.addNotifier(patchTuxtxtConfFile, initial_call = False, immediate_feedback = False)
-	config.usage.tuxtxt_TTFScreenResX.addNotifier(patchTuxtxtConfFile, initial_call = False, immediate_feedback = False)
-	config.usage.tuxtxt_StartX.addNotifier(patchTuxtxtConfFile, initial_call = False, immediate_feedback = False)
-	config.usage.tuxtxt_EndX.addNotifier(patchTuxtxtConfFile, initial_call = False, immediate_feedback = False)
-	config.usage.tuxtxt_StartY.addNotifier(patchTuxtxtConfFile, initial_call = False, immediate_feedback = False)
-	config.usage.tuxtxt_EndY.addNotifier(patchTuxtxtConfFile, initial_call = False, immediate_feedback = False)
-	config.usage.tuxtxt_TTFShiftY.addNotifier(patchTuxtxtConfFile, initial_call = False, immediate_feedback = False)
-	config.usage.tuxtxt_TTFShiftX.addNotifier(patchTuxtxtConfFile, initial_call = False, immediate_feedback = False)
-	config.usage.tuxtxt_TTFWidthFactor16.addNotifier(patchTuxtxtConfFile, initial_call = False, immediate_feedback = False)
-	config.usage.tuxtxt_TTFHeightFactor16.addNotifier(patchTuxtxtConfFile, initial_call = False, immediate_feedback = False)
-	config.usage.tuxtxt_CleanAlgo.addNotifier(patchTuxtxtConfFile, initial_call = False, immediate_feedback = False)
+	config.usage.tuxtxt_font_and_res.addNotifier(patchTuxtxtConfFile, initial_call=False, immediate_feedback=False)
+	config.usage.tuxtxt_UseTTF.addNotifier(patchTuxtxtConfFile, initial_call=False, immediate_feedback=False)
+	config.usage.tuxtxt_TTFBold.addNotifier(patchTuxtxtConfFile, initial_call=False, immediate_feedback=False)
+	config.usage.tuxtxt_TTFScreenResX.addNotifier(patchTuxtxtConfFile, initial_call=False, immediate_feedback=False)
+	config.usage.tuxtxt_StartX.addNotifier(patchTuxtxtConfFile, initial_call=False, immediate_feedback=False)
+	config.usage.tuxtxt_EndX.addNotifier(patchTuxtxtConfFile, initial_call=False, immediate_feedback=False)
+	config.usage.tuxtxt_StartY.addNotifier(patchTuxtxtConfFile, initial_call=False, immediate_feedback=False)
+	config.usage.tuxtxt_EndY.addNotifier(patchTuxtxtConfFile, initial_call=False, immediate_feedback=False)
+	config.usage.tuxtxt_TTFShiftY.addNotifier(patchTuxtxtConfFile, initial_call=False, immediate_feedback=False)
+	config.usage.tuxtxt_TTFShiftX.addNotifier(patchTuxtxtConfFile, initial_call=False, immediate_feedback=False)
+	config.usage.tuxtxt_TTFWidthFactor16.addNotifier(patchTuxtxtConfFile, initial_call=False, immediate_feedback=False)
+	config.usage.tuxtxt_TTFHeightFactor16.addNotifier(patchTuxtxtConfFile, initial_call=False, immediate_feedback=False)
+	config.usage.tuxtxt_CleanAlgo.addNotifier(patchTuxtxtConfFile, initial_call=False, immediate_feedback=False)
 
 	config.usage.sort_settings = ConfigYesNo(default=False)
 	choicelist = []
