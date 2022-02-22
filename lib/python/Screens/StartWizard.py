@@ -8,6 +8,8 @@ try:
 except:
 	OverscanWizard = None
 
+from boxbranding import getBoxType
+
 from Components.Pixmap import Pixmap
 from Components.ProgressBar import ProgressBar
 from Components.Label import Label

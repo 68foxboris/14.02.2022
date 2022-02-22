@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+from boxbranding import getMachineBuild, getMachineBrand, getMachineName
 from Tools.Profile import profile
 
 from Screen import Screen

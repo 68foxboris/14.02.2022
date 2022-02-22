@@ -17,6 +17,7 @@ from Tools import Notifications
 from time import time, localtime
 from GlobalActions import globalActionMap
 from enigma import eDVBVolumecontrol, eTimer, eDVBLocalTimeHandler, eServiceReference, eStreamServer, quitMainloop, iRecordableService
+from boxbranding import getMachineBrand, getMachineName, getBrandOEM, getMachineBuild
 
 inStandby = None
 infoBarInstance = None

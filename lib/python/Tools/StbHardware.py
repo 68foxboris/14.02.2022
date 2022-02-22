@@ -3,7 +3,7 @@ from os.path import exists, isfile
 from struct import pack, unpack
 from time import localtime, time, timezone
 
-from Components.SystemInfo import BoxInfo
+from boxbranding import getBoxType, getBrandOEM
 from Tools.Directories import fileReadLine, fileWriteLine
 
 MODULE_NAME = __name__.split(".")[-1]
@@ -53,16 +53,15 @@ def getBoxRCType():
 
 
 def getFPVersion():
-	if isfile("/proc/stb/info/micomver"):
-		version = fileReadLine("/proc/stb/info/micomver", "unknown", source=MODULE_NAME)
-	elif isfile("/proc/stb/fp/version"):
-		if BoxInfo.getItem("platform") == "dm4kgen" or BoxInfo.getItem("model") in ("dm520", "dm7080", "dm820"):
-			version = fileReadLine("/proc/stb/fp/version", "unknown", source=MODULE_NAME)
+	version = None
+	try:
+		if getBrandOEM() == "blackbox" and isfile("/proc/stb/info/micomver"):
+			version = fileReadLine("/proc/stb/info/micomver", source=MODULE_NAME)
+		elif getBoxType() in ('dm7080', 'dm820', 'dm520', 'dm525', 'dm900', 'dm920'):
+			version = open("/proc/stb/fp/version", "r").read()
 		else:
-			version = int(fileReadLine("/proc/stb/fp/version", "0", source=MODULE_NAME))
-	elif isfile("/sys/firmware/devicetree/base/bolt/tag"):
-		version = fileReadLine("/sys/firmware/devicetree/base/bolt/tag", "unknown", source=MODULE_NAME).rstrip("\0")
-	else:
+			version = int(open("/proc/stb/fp/version", "r").read())
+	except IOError:
 		try:
 			with open("/dev/dbox/fp0") as fd:
 				version = ioctl(fd.fileno(), 0)

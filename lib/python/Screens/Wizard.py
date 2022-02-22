@@ -1,3 +1,4 @@
+from boxbranding import getMachineBrand, getMachineName
 from Screen import Screen
 from Screens.MessageBox import MessageBox
 from Components.config import config, ConfigText, ConfigPassword, KEY_LEFT, KEY_RIGHT, KEY_0, KEY_DELETE, KEY_BACKSPACE, KEY_ASCII
@@ -467,7 +468,7 @@ class Wizard(Screen):
 		return False
 
 	def getTranslation(self, text):
-		return _(text)
+		return _(text).replace("%s %s", "%s %s" % (getMachineBrand(), getMachineName()))
 
 	def updateText(self, firstset=False):
 		text = self.getTranslation(self.wizard[self.currStep]["text"])

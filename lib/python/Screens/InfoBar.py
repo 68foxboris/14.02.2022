@@ -11,6 +11,9 @@ from Screens.MessageBox import MessageBox
 
 profile("LOAD:enigma")
 import enigma
+from boxbranding import getBoxType, getMachineBrand, getBrandOEM, getMachineBuild, getMachineName
+
+boxtype = getBoxType()
 
 profile("LOAD:InfoBarGenerics")
 from Screens.InfoBarGenerics import InfoBarShowHide, \

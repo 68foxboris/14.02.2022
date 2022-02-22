@@ -10,6 +10,7 @@ from Tools import Notifications
 from Screen import Screen
 from Screens.MessageBox import MessageBox
 import Screens.Standby
+from boxbranding import getMachineBrand, getMachineName
 
 
 class JobView(InfoBarNotifications, ConfigListScreen, Screen):

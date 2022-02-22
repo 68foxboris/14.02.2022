@@ -3,7 +3,7 @@ from Tools.Directories import resolveFilename, SCOPE_SKINS
 from xml.etree.ElementTree import ElementTree
 from Components.config import config, ConfigInteger
 from Components.RcModel import rc_model
-from Components.SystemInfo import BoxInfo
+from boxbranding import getBoxType
 
 #config.misc.rcused = ConfigInteger(default=1)
 

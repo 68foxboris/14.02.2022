@@ -16,6 +16,7 @@ from Screens.ChoiceBox import ChoiceBox
 from Screens.ServiceStopScreen import ServiceStopScreen
 from Screens.AutoDiseqc import AutoDiseqc
 from Tools.BoundFunction import boundFunction
+from boxbranding import getMachineBrand
 from Tools.Directories import fileExists
 
 from time import mktime, localtime, time
