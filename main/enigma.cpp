@@ -367,17 +367,7 @@ void runMainloop()
 
 const char *getEnigmaVersionString()
 {
-	return enigma2_version;
-}
-
-const char *getBoxType()
-{
-	return BOXTYPE;
-}
-
-const char *getBoxBrand()
-{
-	return BOXBRAND;
+	return enigma2_date;
 }
 
 #include <malloc.h>
