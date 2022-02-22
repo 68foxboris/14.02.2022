@@ -468,8 +468,6 @@ extern void runMainloop();
 extern void quitMainloop(int exit_code);
 extern eApplication *getApplication();
 extern const char *getEnigmaVersionString();
-extern const char *getBoxType();
-extern const char *getBoxBrand();
 extern void dump_malloc_stats(void);
 extern void pauseInit(void);
 extern void resumeInit(void);
