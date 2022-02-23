@@ -424,9 +424,10 @@ int eDVBVideo::startPid(int pid, int type)
 
 void eDVBVideo::stop()
 {
+#if defined(HAVE_FCC_ABILITY)
 	if (m_fcc_enable)
 		return;
-
+#endif
 	if (m_fd_demux >= 0)
 	{
 		eDebugNoNewLineStart("[eDVBVideo%d] DEMUX_STOP  ", m_dev);
@@ -1021,8 +1022,12 @@ RESULT eTSMPEGDecoder::setAC3Delay(int delay)
 eTSMPEGDecoder::eTSMPEGDecoder(eDVBDemux *demux, int decoder)
 	: m_demux(demux),
 		m_vpid(-1), m_vtype(-1), m_apid(-1), m_atype(-1), m_pcrpid(-1), m_textpid(-1),
+#if defined(HAVE_FCC_ABILITY)
 		m_changed(0), m_decoder(decoder), m_video_clip_fd(-1), m_showSinglePicTimer(eTimer::create(eApp)),
 		m_fcc_fd(-1), m_fcc_enable(false), m_fcc_state(fcc_state_stop), m_fcc_feid(-1), m_fcc_vpid(-1), m_fcc_vtype(-1), m_fcc_pcrpid(-1)
+#else
+		m_changed(0), m_decoder(decoder), m_video_clip_fd(-1), m_showSinglePicTimer(eTimer::create(eApp))
+#endif
 {
 	if (m_demux)
 	{

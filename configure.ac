@@ -440,6 +440,16 @@ if test x"$with_alsamixer" != xno ; then
 	AC_DEFINE_UNQUOTED(ALSA_VOLUME_MIXER, "$withval",[Defines which alsa mixer to use for volume control])
 fi
 
+AC_ARG_WITH(fcc,
+	AC_HELP_STRING([--with-fcc], [use FCC specific codes for fast channel change]),
+	[[fcc=$withval]],
+	[[fcc=no]]
+)
+AM_CONDITIONAL(HAVE_FCC_ABILITY, test x"$with_fcc" = xyes)
+if test x"$with_fcc" = xyes ; then
+	AC_DEFINE(HAVE_FCC_ABILITY, 1,[use FCC specific codes for fast channel change])
+fi
+
 AC_ARG_WITH(fbdev,
 	AC_HELP_STRING([--with-fbdev=devicename], [use devicename for framebuffer device, e.g. /dev/fb0 ]),
 	[[with_fbdev=$withval]],

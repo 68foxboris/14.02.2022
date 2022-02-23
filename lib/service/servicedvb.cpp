@@ -30,9 +30,9 @@
 
 #include <byteswap.h>
 #include <netinet/in.h>
-
+#if defined(HAVE_FCC_ABILITY)
 #include <lib/dvb/fcc.h>
-
+#endif
 #ifndef BYTE_ORDER
 #error no byte order defined!
 #endif

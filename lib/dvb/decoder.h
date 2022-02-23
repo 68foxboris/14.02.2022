@@ -42,7 +42,11 @@ private:
 	static int readApiSize(int fd, int &xres, int &yres, int &aspect);
 public:
 	enum { UNKNOWN = -1, MPEG2, MPEG4_H264, VC1 = 3, MPEG4_Part2, VC1_SM, MPEG1, H265_HEVC, AVS = 16, AVS2 = 40 };
+#if defined(HAVE_FCC_ABILITY)
 	eDVBVideo(eDVBDemux *demux, int dev, bool fcc_enable=false);
+#else
+	eDVBVideo(eDVBDemux *demux, int dev);
+#endif
 	void stop();
 	int startPid(int pid, int type=MPEG2);
 	void flush();
@@ -101,6 +105,7 @@ private:
 	ePtr<eDVBPCR> m_pcr;
 	ePtr<eDVBTText> m_text;
 	int m_vpid, m_vtype, m_apid, m_atype, m_pcrpid, m_textpid;
+#if defined(HAVE_FCC_ABILITY)
 	int m_fcc_fd;
 	bool m_fcc_enable;
 	int m_fcc_state;
@@ -109,7 +114,7 @@ private:
 	int m_fcc_vpid;
 	int m_fcc_vtype;
 	int m_fcc_pcrpid;
-
+#endif
 	enum
 	{
 		changeVideo = 1,
