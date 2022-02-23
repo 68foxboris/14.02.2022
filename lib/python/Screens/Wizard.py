@@ -468,7 +468,7 @@ class Wizard(Screen):
 		return False
 
 	def getTranslation(self, text):
-		return _(text).replace("%s %s", "%s %s" % (getMachineBrand(), getMachineName()))
+		return _(text).replace("%s %s (kernel %s)", "%s %s (kernel %s)" % (BoxInfo.getItem("displaybrand"), BoxInfo.getItem("displaymodel"), BoxInfo.getItem("kernel"))).replace("%s (type %s id %s)", "%s (type %s id %s)" % (BoxInfo.getItem("rcname"), BoxInfo.getItem("rctype"), BoxInfo.getItem("rcidnum")))
 
 	def updateText(self, firstset=False):
 		text = self.getTranslation(self.wizard[self.currStep]["text"])
