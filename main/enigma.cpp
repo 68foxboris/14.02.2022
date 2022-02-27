@@ -175,11 +175,11 @@ void quitMainloop(int exitCode)
 		if (fd >= 0)
 		{
 			if (ioctl(fd, 10 /*FP_CLEAR_WAKEUP_TIMER*/) < 0)
-				eDebug("[quitMainloop] FP_CLEAR_WAKEUP_TIMER failed: %m");
+				eDebug("[Enigma] quitMainloop FP_CLEAR_WAKEUP_TIMER failed!  (%m)");
 			close(fd);
 		}
 		else
-			eDebug("[quitMainloop] open /dev/dbox/fp0 for wakeup timer clear failed: %m");
+			eDebug("[Enigma] quitMainloop open /dev/dbox/fp0 for wakeup timer clear failed!  (%m)");
 	}
 	exit_code = exitCode;
 	eApp->quit(0);
@@ -248,8 +248,8 @@ int main(int argc, char **argv)
 	gLCDDC::getInstance(my_lcd_dc);
 
 
-		/* ok, this is currently hardcoded for arabic. */
-			/* some characters are wrong in the regular font, force them to use the replacement font */
+	/* ok, this is currently hardcoded for arabic. */
+	/* some characters are wrong in the regular font, force them to use the replacement font */
 	for (int i = 0x60c; i <= 0x66d; ++i)
 		eTextPara::forceReplacementGlyph(i);
 	eTextPara::forceReplacementGlyph(0xfdf2);
@@ -264,7 +264,7 @@ int main(int argc, char **argv)
 
 /*	if (double_buffer)
 	{
-		eDebug("[MAIN] - double buffering found, enable buffered graphics mode.");
+		eDebug("[Enigma] Double buffering found, enable buffered graphics mode.");
 		dsk.setCompositionMode(eWidgetDesktop::cmBuffered);
 	} */
 
@@ -281,7 +281,7 @@ int main(int argc, char **argv)
 	dsk_lcd.setRedrawTask(main);
 
 
-	eDebug("[MAIN] Loading spinners...");
+	eDebug("[Enigma] Loading spinners.");
 
 	{
 		int i;
@@ -300,11 +300,11 @@ int main(int argc, char **argv)
 			loadImage(wait[i], rfilename.c_str());
 			if (!wait[i])
 			{
-				eDebug("[MAIN] failed to load %s: %m", rfilename.c_str());
+				eDebug("[Enigma] Failed to load %s: %m", rfilename.c_str());
 				break;
 			}
 		}
-		eDebug("[MAIN] found %d spinner!", i);
+		eDebug("[Enigma] Found %d spinners.", i);
 		if (i)
 			my_dc->setSpinner(eRect(ePoint(100, 100), wait[0]->size()), wait, i);
 		else
@@ -315,7 +315,7 @@ int main(int argc, char **argv)
 
 	eRCInput::getInstance()->keyEvent.connect(sigc::ptr_fun(&keyEvent));
 
-	printf("[MAIN] executing main\n");
+	printf("[Enigma] Executing StartEnigma.py");
 
 	bsodCatchSignals();
 	catchTermSignal();
@@ -332,7 +332,7 @@ int main(int argc, char **argv)
 
 	if (exit_code == 5) /* python crash */
 	{
-		eDebug("[MAIN] (exit code 5)");
+		eDebug("[Enigma] Exit code 5!");
 		bsodFatal(0);
 	}
 
@@ -375,9 +375,14 @@ const char *getEnigmaVersionString()
 void dump_malloc_stats(void)
 {
 #ifdef __GLIBC__
-	struct mallinfo mi = mallinfo();
-	eDebug("[ENIGMA] MALLOC: %d total", mi.uordblks);
+#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 33)
+	struct mallinfo2 mi = mallinfo2();
+	eDebug("[Enigma] MALLOC: %zu total", mi.uordblks);
 #else
-	eDebug("[ENIGMA] MALLOC: info not exposed");
+	struct mallinfo mi = mallinfo();
+	eDebug("[Enigma] MALLOC: %d total", mi.uordblks);
+#endif
+#else
+	eDebug("[Enigma] MALLOC: Info not exposed");
 #endif
 }
