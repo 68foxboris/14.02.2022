@@ -274,8 +274,8 @@ class InfoBarShowHide(InfoBarScreenSaver):
 		}, prio=1, description=_("InfoBar Show/Hide Actions")) # lower prio to make it possible to override ok and cancel..
 
 		self.__event_tracker = ServiceEventTracker(screen=self, eventmap={
-				iPlayableService.evStart: self.serviceStarted,
-			})
+			iPlayableService.evStart: self.serviceStarted,
+		})
 
 		InfoBarScreenSaver.__init__(self)
 		self.__state = self.STATE_SHOWN
@@ -1103,8 +1103,8 @@ class InfoBarEPG:
 		self.eventView = None
 		self.epglist = []
 		self.__event_tracker = ServiceEventTracker(screen=self, eventmap={
-				iPlayableService.evUpdatedEventInfo: self.__evEventInfoChanged,
-			})
+			iPlayableService.evUpdatedEventInfo: self.__evEventInfoChanged,
+		})
 
 		self["EPGActions"] = HelpableActionMap(self, ["InfobarEPGActions"], {
 			"showEventInfo": (self.showDefaultEPG, _("Show sevice event information")),
@@ -3878,11 +3878,11 @@ class InfoBarZoom:
 		self.zoomrate = 0
 		self.zoomin = 1
 
-		self["ZoomActions"] = HelpableActionMap(self, "InfobarZoomActions",
-			{
-				"ZoomInOut": (self.ZoomInOut, _("Zoom In/Out TV...")),
-				"ZoomOff": (self.ZoomOff, _("Zoom Off...")),
-			}, prio=2)
+		self["ZoomActions"] = HelpableActionMap(self, ["InfobarZoomActions"],{
+			"ZoomInOut": (self.ZoomInOut, _("Zoom In/Out TV...")),
+			"ZoomOff": (self.ZoomOff, _("Zoom Off...")),
+		}, prio=2, description=_("Zoom Actions"))
+
 
 	def ZoomInOut(self):
 		zoomval = 0
@@ -3986,7 +3986,7 @@ class InfoBarHdmi2:
 			return _("Turn off HDMI-IN PiP mode")
 
 	def HDMIInPiP(self):
-		if platform == "dm4kgen" or model in ("dm7080", "dm820"):
+		if getMachineBuild() in ('dm7080', 'dm820', 'dm900', 'dm920'):
 			f = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "r")
 			check = f.read()
 			f.close()
@@ -4024,7 +4024,7 @@ class InfoBarHdmi2:
 					del self.session.pip
 
 	def HDMIInFull(self):
-		if platform == "dm4kgen" or model in ("dm7080", "dm820"):
+		if getMachineBuild() in ('dm7080', 'dm820', 'dm900', 'dm920'):
 			f = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "r")
 			check = f.read()
 			f.close()
@@ -4039,7 +4039,7 @@ class InfoBarHdmi2:
 				self.oldvideomode_60hz = f.read()
 				f.close()
 				f = open("/proc/stb/video/videomode", "w")
-				if platform == "dm4kgen" or model in ("dm7080", "dm820"):
+				if getMachineBuild() in ('dm900', 'dm920'):
 					f.write("1080p")
 				else:
 					f.write("720p")
