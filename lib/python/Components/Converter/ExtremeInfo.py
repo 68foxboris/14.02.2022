@@ -289,13 +289,16 @@ class ExtremeInfo(Poll, Converter, object):
 			return True
 		return False
 
-	def getEmu(self):
+	def getecminfo(self):
 		try:
-			content = open("/tmp/ecm.info", "r").read()
-		except:
-			content = ''
+			with open("/tmp/ecm.info", "r") as fd:
+				content = fd.read().split('\n')
+		except (IOError, OSError) as err:
+			content = []
+		return content
 
-		contentInfo = content.split('\n')
+	def getEmu(self):
+		contentInfo = self.getecminfo()
 		for line in contentInfo:
 			if line.startswith('source:'):
 				using = self.parseEcmInfoLine(line)
@@ -309,12 +312,7 @@ class ExtremeInfo(Poll, Converter, object):
 		return False
 
 	def getCrd(self):
-		try:
-			content = open("/tmp/ecm.info", "r").read()
-		except:
-			content = ''
-
-		contentInfo = content.split('\n')
+		contentInfo = self.getecminfo()
 		for line in contentInfo:
 			if line.startswith('from:'):
 				using = self.parseEcmInfoLine(line)
@@ -328,12 +326,7 @@ class ExtremeInfo(Poll, Converter, object):
 		return False
 
 	def getNet(self):
-		try:
-			content = open("/tmp/ecm.info", "r").read()
-		except:
-			content = ''
-
-		contentInfo = content.split('\n')
+		contentInfo = self.getecminfo()
 		for line in contentInfo:
 			if line.startswith('source:'):
 				using = self.parseEcmInfoLine(line)
@@ -352,14 +345,7 @@ class ExtremeInfo(Poll, Converter, object):
 		if service:
 			info = service and service.info()
 			if info:
-				try:
-					content = open("/tmp/ecm.info", "r").read()
-				except:
-					content = ''
-
-				contentInfo = content.split('\n')
-				if content == '':
-					return False
+				contentInfo = self.getecminfo()
 				for line in contentInfo:
 					if line.startswith('caid:'):
 						caid = self.parseEcmInfoLine(line)
@@ -389,14 +375,7 @@ class ExtremeInfo(Poll, Converter, object):
 		if service:
 			info = service and service.info()
 			if info:
-				try:
-					content = open("/tmp/ecm.info", "r").read()
-				except:
-					content = ''
-
-				contentInfo = content.split('\n')
-				if content == '':
-					return False
+				contentInfo = self.getecminfo()
 				for line in contentInfo:
 					if line.startswith('caid:'):
 						caid = self.parseEcmInfoLine(line)
@@ -426,14 +405,7 @@ class ExtremeInfo(Poll, Converter, object):
 		if service:
 			info = service and service.info()
 			if info:
-				try:
-					content = open("/tmp/ecm.info", "r").read()
-				except:
-					content = ''
-
-				contentInfo = content.split('\n')
-				if content == '':
-					return False
+				contentInfo = self.getecminfo()
 				for line in contentInfo:
 					if line.startswith('caid:'):
 						caid = self.parseEcmInfoLine(line)
@@ -463,14 +435,7 @@ class ExtremeInfo(Poll, Converter, object):
 		if service:
 			info = service and service.info()
 			if info:
-				try:
-					content = open("/tmp/ecm.info", "r").read()
-				except:
-					content = ''
-
-				contentInfo = content.split('\n')
-				if content == '':
-					return False
+				contentInfo = self.getecminfo()
 				for line in contentInfo:
 					if line.startswith('caid:'):
 						caid = self.parseEcmInfoLine(line)
@@ -500,14 +465,7 @@ class ExtremeInfo(Poll, Converter, object):
 		if service:
 			info = service and service.info()
 			if info:
-				try:
-					content = open("/tmp/ecm.info", "r").read()
-				except:
-					content = ''
-
-				contentInfo = content.split('\n')
-				if content == '':
-					return False
+				contentInfo = self.getecminfo()
 				for line in contentInfo:
 					if line.startswith('caid:'):
 						caid = self.parseEcmInfoLine(line)
@@ -537,14 +495,7 @@ class ExtremeInfo(Poll, Converter, object):
 		if service:
 			info = service and service.info()
 			if info:
-				try:
-					content = open("/tmp/ecm.info", "r").read()
-				except:
-					content = ''
-
-				contentInfo = content.split('\n')
-				if content == '':
-					return False
+				contentInfo = self.getecminfo()
 				for line in contentInfo:
 					if line.startswith('caid:'):
 						caid = self.parseEcmInfoLine(line)
@@ -574,14 +525,7 @@ class ExtremeInfo(Poll, Converter, object):
 		if service:
 			info = service and service.info()
 			if info:
-				try:
-					content = open("/tmp/ecm.info", "r").read()
-				except:
-					content = ''
-
-				contentInfo = content.split('\n')
-				if content == '':
-					return False
+				contentInfo = self.getecminfo()
 				for line in contentInfo:
 					if line.startswith('caid:'):
 						caid = self.parseEcmInfoLine(line)
@@ -611,14 +555,7 @@ class ExtremeInfo(Poll, Converter, object):
 		if service:
 			info = service and service.info()
 			if info:
-				try:
-					content = open("/tmp/ecm.info", "r").read()
-				except:
-					content = ''
-
-				contentInfo = content.split('\n')
-				if content == '':
-					return False
+				contentInfo = self.getecminfo()
 				for line in contentInfo:
 					if line.startswith('caid:'):
 						caid = self.parseEcmInfoLine(line)
@@ -648,14 +585,7 @@ class ExtremeInfo(Poll, Converter, object):
 		if service:
 			info = service and service.info()
 			if info:
-				try:
-					content = open("/tmp/ecm.info", "r").read()
-				except:
-					content = ''
-
-				contentInfo = content.split('\n')
-				if content == '':
-					return False
+				contentInfo = self.getecminfo()
 				for line in contentInfo:
 					if line.startswith('caid:'):
 						caid = self.parseEcmInfoLine(line)
@@ -685,14 +615,7 @@ class ExtremeInfo(Poll, Converter, object):
 		if service:
 			info = service and service.info()
 			if info:
-				try:
-					content = open("/tmp/ecm.info", "r").read()
-				except:
-					content = ''
-
-				contentInfo = content.split('\n')
-				if content == '':
-					return False
+				contentInfo = self.getecminfo()
 				for line in contentInfo:
 					if line.startswith('caid:'):
 						caid = self.parseEcmInfoLine(line)
@@ -722,14 +645,7 @@ class ExtremeInfo(Poll, Converter, object):
 		if service:
 			info = service and service.info()
 			if info:
-				try:
-					content = open("/tmp/ecm.info", "r").read()
-				except:
-					content = ''
-
-				contentInfo = content.split('\n')
-				if content == '':
-					return False
+				contentInfo = self.getecminfo()
 				for line in contentInfo:
 					if line.startswith('caid:'):
 						caid = self.parseEcmInfoLine(line)
