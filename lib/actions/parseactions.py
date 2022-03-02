@@ -6,7 +6,7 @@ import sys
 
 
 def filter(g):
-	while 1:
+	while True:
 		t = g.next()
 		if t[1] == "/*":
 			while g.next()[1] != "*/":
