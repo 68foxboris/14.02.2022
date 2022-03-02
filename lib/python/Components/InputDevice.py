@@ -93,7 +93,7 @@ class InputDevices:
 			return None
 
 	def getDeviceList(self):
-		return sorted(list(self.devices.keys()))
+		return sorted(self.devices.keys())
 
 	# struct input_event {
 	# 	struct timeval time;    -> ignored
@@ -346,7 +346,7 @@ class RemoteControl:
 class InitInputDevices:
 	def __init__(self):
 		self.currentDevice = ""
-		for device in sorted(list(inputDevices.devices.keys())):
+		for device in sorted(inputDevices.devices.keys()):
 			print("[InputDevice] InitInputDevices DEBUG: Creating config entry for device: '%s' -> '%s'." % (device, inputDevices.devices[device]["name"]))
 			self.currentDevice = device
 			self.setupConfigEntries(self.currentDevice)
