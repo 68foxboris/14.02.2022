@@ -45,18 +45,24 @@ class ConsoleItem:
 		callback = self.callback
 		if callback is not None:
 			data = ''.join(self.appResults)
+			data = data if self.binary else data.decode()
 			callback(data, retval, self.extra_args)
 
 
 class Console(object):
-	def __init__(self):
+	"""
+		Console by default will work with strings on callback.
+		If binary data required class shoud be initialized with Console(binary=True)
+	"""
+	def __init__(self, binary=False):
 		# Still called appContainers because Network.py accesses it to
 		# know if there's still stuff running
 		self.appContainers = {}
+		self.binary = binary
 
 	def ePopen(self, cmd, callback=None, extra_args=[]):
 		print("[Console] command:", cmd)
-		return ConsoleItem(self.appContainers, cmd, callback, extra_args)
+		return ConsoleItem(self.appContainers, cmd, callback, extra_args, self.binary)
 
 	def eBatch(self, cmds, callback, extra_args=[], debug=False):
 		self.debug = debug
