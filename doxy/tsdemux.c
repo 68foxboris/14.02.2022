@@ -2804,11 +2804,9 @@ calculate_and_push_newsegment (GstTSDemux * demux, TSDemuxStream * stream,
       GstSegment *seg = &base->out_segment;
       GstClockTime base =
           seg->base + seg->position - (seg->start + seg->offset);
-      GstClockTime stop = seg->stop;
-
       gst_segment_init (seg, GST_FORMAT_TIME);
       seg->start = firstts;
-      seg->stop = MAX (seg->start, stop);
+      seg->stop = GST_CLOCK_TIME_NONE;
       seg->position = firstts;
       seg->time = firstts;
       seg->rate = demux->rate;
