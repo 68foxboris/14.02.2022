@@ -29,8 +29,6 @@ void eDVBPMTParser::clearProgramInfo(program &program)
 	program.pmtPid = -1;
 	program.textPid = -1;
 	program.aitPid = -1;
-	program.isCached = false;
-	program.pmtVersion = -1;
 	program.dsmccPid = -1;
 	program.serviceId = -1;
 	program.adapterId = -1;
@@ -69,7 +67,6 @@ int eDVBPMTParser::getProgramInfo(program &program)
 		eDVBTableSpec table_spec;
 		ptr->getSpec(table_spec);
 		program.pmtPid = table_spec.pid < 0x1fff ? table_spec.pid : -1;
-		program.pmtVersion = table_spec.version;
 
 		for (const auto i : ptr->getSections())
 		{
@@ -521,11 +518,11 @@ DEFINE_REF(eDVBPMTParser::eStreamData);
 
 eDVBPMTParser::eStreamData::eStreamData(eDVBPMTParser::program &program)
 {
-	for (const auto i : program.videoStreams)
+	for (const auto &i : program.videoStreams)
 		videoStreams.push_back(i.pid);
-	for (const auto i : program.audioStreams)
+	for (const auto &i : program.audioStreams)
 		audioStreams.push_back(i.pid);
-	for (const auto i : program.subtitleStreams)
+	for (const auto &i : program.subtitleStreams)
 		subtitleStreams.push_back(i.pid);
 	pcrPid = program.pcrPid;
 	pmtPid = program.pmtPid;
@@ -535,7 +532,7 @@ eDVBPMTParser::eStreamData::eStreamData(eDVBPMTParser::program &program)
 	adapterId = program.adapterId;
 	demuxId = program.demuxId;
 	serviceId = program.serviceId;
-	for (const auto it : program.caids)
+	for (const auto &it : program.caids)
 	{
 		caIds.push_back(it.caid);
 		ecmPids.push_back(it.capid);
