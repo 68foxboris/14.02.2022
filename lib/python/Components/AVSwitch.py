@@ -330,7 +330,7 @@ def InitAVSwitch():
 	if BoxInfo.getItem("CanBTAudioDelay"):
 		def setBTAudioDelay(configElement):
 			print("[AVSwitch] Write to /proc/stb/audio/btaudio_delay")
-			open("/proc/stb/audio/btaudio_delay", "w").write(format(configElement.value * 90))
+			open(BoxInfo.getItem("CanBTAudioDelay"), "w").write(format(configElement.value * 90))
 		config.av.btaudiodelay = ConfigSelectionNumber(-1000, 1000, 5, default=0)
 		config.av.btaudiodelay.addNotifier(setBTAudioDelay)
 	else:
@@ -362,7 +362,7 @@ def InitAVSwitch():
 			open(BoxInfo.getItem("HasAutoVolume"), "w").write(configElement.value)
 		choices = [("none", _("off")), ("hdmi", "HDMI"), ("spdif", "SPDIF"), ("dac", "DAC")]
 		default = "none"
-		if SystemInfo["CanProc"]:
+		if BoxInfo.getItem("CanProc"):
 			f = "/proc/stb/audio/avl_choices"
 			(choices, default) = readChoices(f, choices, default)
 		config.av.autovolume = ConfigSelection(choices=choices, default=default)
@@ -429,7 +429,7 @@ def InitAVSwitch():
 		else:
 			choices = [("auto", "auto"), ("rgb", "RGB"), ("420", "4:2:0"), ("422", "4:2:2"), ("444", "4:4:4")]
 			default = "auto"
-		if os.path.exists("/proc/stb/video/hdmi_colorspace_choices") and SystemInfo["CanProc"]:
+		if os.path.exists("/proc/stb/video/hdmi_colorspace_choices") and BoxInfo.getItem("CanProc"):
 			f = "/proc/stb/video/hdmi_colorspace_choices"
 			(choices, default) = readChoices(f, choices, default)
 		config.av.hdmicolorspace = ConfigSelection(choices=choices, default=default)
@@ -440,7 +440,7 @@ def InitAVSwitch():
 			open(BoxInfo.getItem("HasColordepth"), "w").write(configElement.value)
 		choices = [("auto", "auto"), ("8bit", "8bit"), ("10bit", "10bit"), ("12bit", "12bit")]
 		default = "auto"
-		if os.path.exists("/proc/stb/video/hdmi_colordepth_choices") and SystemInfo["CanProc"]:
+		if os.path.exists("/proc/stb/video/hdmi_colordepth_choices") and BoxInfo.getItem("CanProc"):
 			f = "/proc/stb/video/hdmi_colordepth_choices"
 			(choices, default) = readChoices(f, choices, default)
 		config.av.hdmicolordepth = ConfigSelection(choices=choices, default=default)
@@ -457,7 +457,7 @@ def InitAVSwitch():
 			open(BoxInfo.getItem("HasColorimetry"), "w").write(configElement.value)
 		choices=[("auto", "auto"), ("bt2020ncl", "BT 2020 NCL"), ("bt2020cl", "BT 2020 CL"), ("bt709", "BT 709")]
 		default = "auto"
-		if os.path.exists("/proc/stb/video/hdmi_colorimetry_choices") and SystemInfo["CanProc"]:
+		if os.path.exists("/proc/stb/video/hdmi_colorimetry_choices") and BoxInfo.getItem("CanProc"):
 			f = "/proc/stb/video/hdmi_colorimetry_choices"
 			(choices, default) = readChoices(f, choices, default)
 		config.av.hdmicolorimetry = ConfigSelection(choices=choices, default=default)
