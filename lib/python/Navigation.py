@@ -188,7 +188,7 @@ class Navigation:
 			else:
 				playref = ref
 			if self.pnav:
-				if SystemInfo["FCCactive"] and not self.pnav.playService(playref):
+				if BoxInfo.getItem("FCCactive") and not self.pnav.playService(playref):
 					self.currentlyPlayingServiceReference = playref
 					self.currentlyPlayingServiceOrGroup = ref
 					return 0

@@ -12,7 +12,7 @@ from subprocess import PIPE, Popen
 
 from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl
 
-from Tools.Directories import SCOPE_LIBDIR, SCOPE_SKINS, fileCheck, fileContains, fileReadLine, fileReadLines, resolveFilename
+from Tools.Directories import SCOPE_LIBDIR, SCOPE_SKINS, fileCheck, fileExists, pathExists, fileHas, fileContains, fileReadLine, fileReadLines, resolveFilename
 
 MODULE_NAME = __name__.split(".")[-1]
 
@@ -285,7 +285,7 @@ SystemInfo["RcTypeChangable"] = not (model.startswith("et8500") or model.startsw
 SystemInfo["HasBypassEdidChecking"] = fileCheck("/proc/stb/hdmi/bypass_edid_checking")
 SystemInfo["HasMMC"] = "root" in cmdline and cmdline["root"].startswith("/dev/mmcblk")
 SystemInfo["HasColorspace"] = fileCheck("/proc/stb/video/hdmi_colorspace")
-SystemInfo["HasColorspaceSimple"] = BoxInfo.getItem("HasColorspace") and model in ("vusolo4k", "vuuno4k", "vuuno4kse", "vuultimo4k", "vuduo4k", "vuduo4kse")
+SystemInfo["HasColorspaceSimple"] = BoxInfo.getItem("HasColorspace") and BoxInfo.getItem("HasMMC") and BoxInfo.getItem("Blindscan_t2_available")
 SystemInfo["HasTranscoding"] = BoxInfo.getItem("transcoding") or BoxInfo.getItem("multitranscoding") or fileAccess("/proc/stb/encoder/0") or fileCheck("/dev/bcm_enc0")
 SystemInfo["HasH265Encoder"] = fileContains("/proc/stb/encoder/0/vcodec_choices", "h265")
 SystemInfo["CanNotDoSimultaneousTranscodeAndPIP"] = model in ("vusolo4k", "gbquad4k", "gbue4k")
@@ -296,7 +296,8 @@ SystemInfo["Has2160p"] = fileContains("/proc/stb/video/videomode_preferred", "21
 SystemInfo["HasHDMIpreemphasis"] = fileCheck("/proc/stb/hdmi/preemphasis")
 SystemInfo["HasColorimetry"] = fileCheck("/proc/stb/video/hdmi_colorimetry")
 SystemInfo["HasHdrType"] = fileCheck("/proc/stb/video/hdmi_hdrtype")
-SystemInfo["HasScaler_sharpness"] = fileContains("/proc/stb/vmpeg/0/pep_scaler_sharpness")
+SystemInfo["CanChangeOsdAlpha"] = access("/proc/stb/video/alpha", R_OK) and True or False
+SystemInfo["HasScaler_sharpness"] = pathExists("/proc/stb/vmpeg/0/pep_scaler_sharpness")
 SystemInfo["HasHDMI"] = BoxInfo.getItem("hdmi")
 SystemInfo["HasHDMI-CEC"] = BoxInfo.getItem("HasHDMI") and (fileAccess("/dev/cec0") or fileAccess("/dev/hdmi_cec") or fileAccess("/dev/misc/hdmi_cec0"))
 SystemInfo["HasHDMIHDin"] = BoxInfo.getItem("hdmihdin")
@@ -315,23 +316,23 @@ SystemInfo["canDualBoot"] = fileAccess("/dev/block/by-name/flag")
 SystemInfo["canFlashWithOfgwrite"] = brand != "dreambox"
 SystemInfo["HDRSupport"] = fileAccess("/proc/stb/hdmi/hlg_support_choices") and fileCheck("/proc/stb/hdmi/hlg_support")
 SystemInfo["CanProc"] = BoxInfo.getItem("HasMMC") and not BoxInfo.getItem("Blindscan_t2_available")
-SystemInfo["HasMultichannelPCM"] = fileAccess("/proc/stb/audio/multichannel_pcm")
-SystemInfo["HasAutoVolume"] = fileAccess("/proc/stb/audio/avl_choices") and fileCheck("/proc/stb/audio/avl")
-SystemInfo["HasAutoVolumeLevel"] = fileAccess("/proc/stb/audio/autovolumelevel_choices") and fileCheck("/proc/stb/audio/autovolumelevel")
-SystemInfo["Has3DSurround"] = fileAccess("/proc/stb/audio/3d_surround_choices") and fileCheck("/proc/stb/audio/3d_surround")
-SystemInfo["Has3DSpeaker"] = fileAccess("/proc/stb/audio/3d_surround_speaker_position_choices") and fileCheck("/proc/stb/audio/3d_surround_speaker_position")
-SystemInfo["Has3DSurroundSpeaker"] = fileAccess("/proc/stb/audio/3dsurround_choices") and fileCheck("/proc/stb/audio/3dsurround")
-SystemInfo["Has3DSurroundSoftLimiter"] = fileAccess("/proc/stb/audio/3dsurround_softlimiter_choices") and fileCheck("/proc/stb/audio/3dsurround_softlimiter")
-SystemInfo["CanDownmixAC3"] = fileAccess("/proc/stb/audio/ac3_choices", "downmix")
-SystemInfo["CanDownmixDTS"] = fileAccess("/proc/stb/audio/dts_choices", "downmix")
-SystemInfo["CanDownmixAAC"] = fileAccess("/proc/stb/audio/aac_choices", "downmix")
+SystemInfo["HasMultichannelPCM"] = fileCheck("/proc/stb/audio/multichannel_pcm")
+SystemInfo["HasAutoVolume"] = fileExists("/proc/stb/audio/avl_choices") and fileCheck("/proc/stb/audio/avl")
+SystemInfo["HasAutoVolumeLevel"] = fileExists("/proc/stb/audio/autovolumelevel_choices") and fileCheck("/proc/stb/audio/autovolumelevel")
+SystemInfo["Has3DSurround"] = fileExists("/proc/stb/audio/3d_surround_choices") and fileCheck("/proc/stb/audio/3d_surround")
+SystemInfo["Has3DSpeaker"] = fileExists("/proc/stb/audio/3d_surround_speaker_position_choices") and fileCheck("/proc/stb/audio/3d_surround_speaker_position")
+SystemInfo["Has3DSurroundSpeaker"] = fileExists("/proc/stb/audio/3dsurround_choices") and fileCheck("/proc/stb/audio/3dsurround")
+SystemInfo["Has3DSurroundSoftLimiter"] = fileExists("/proc/stb/audio/3dsurround_softlimiter_choices") and fileCheck("/proc/stb/audio/3dsurround_softlimiter")
+SystemInfo["CanDownmixAC3"] = fileHas("/proc/stb/audio/ac3_choices", "downmix")
+SystemInfo["CanDownmixDTS"] = fileHas("/proc/stb/audio/dts_choices", "downmix")
+SystemInfo["CanDownmixAAC"] = fileHas("/proc/stb/audio/aac_choices", "downmix")
 SystemInfo["HDMIAudioSource"] = fileCheck("/proc/stb/hdmi/audio_source")
-SystemInfo["CanAC3Transcode"] = fileAccess("/proc/stb/audio/ac3plus_choices", "force_ac3")
-SystemInfo["CanDTSHD"] = fileAccess("/proc/stb/audio/dtshd_choices", "downmix")
-SystemInfo["CanDownmixAACPlus"] = fileAccess("/proc/stb/audio/aacplus_choices", "downmix")
-SystemInfo["CanAACTranscode"] = fileAccess("/proc/stb/audio/aac_transcode_choices", "off")
-SystemInfo["CanWMAPRO"] = fileAccess("/proc/stb/audio/wmapro_choices", "downmix")
-SystemInfo["CanBTAudio"] = fileAccess("/proc/stb/audio/btaudio_choices", "off")
+SystemInfo["CanAC3Transcode"] = fileHas("/proc/stb/audio/ac3plus_choices", "force_ac3")
+SystemInfo["CanDTSHD"] = fileHas("/proc/stb/audio/dtshd_choices", "downmix")
+SystemInfo["CanDownmixAACPlus"] = fileHas("/proc/stb/audio/aacplus_choices", "downmix")
+SystemInfo["CanAACTranscode"] = fileHas("/proc/stb/audio/aac_transcode_choices", "off")
+SystemInfo["CanWMAPRO"] = fileHas("/proc/stb/audio/wmapro_choices", "downmix")
+SystemInfo["CanBTAudio"] = fileHas("/proc/stb/audio/btaudio_choices", "off")
 SystemInfo["CanBTAudioDelay"] = fileCheck("/proc/stb/audio/btaudio_delay") or fileCheck("/proc/stb/audio/btaudio_delay_pcm")
 SystemInfo["BootDevice"] = getBootdevice()
 SystemInfo["FbcTunerPowerAlwaysOn"] = model in ("vusolo4k", "vuduo4k", "vuduo4kse", "vuultimo4k", "vuuno4k", "vuuno4kse", "gbquad4k", "gbue4k")

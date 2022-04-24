@@ -329,18 +329,12 @@ def InitAVSwitch():
 
 	if BoxInfo.getItem("CanBTAudioDelay"):
 		def setBTAudioDelay(configElement):
-			try:
-				with open(BoxInfo.getItem("CanBTAudioDelay"), "w") as fd:
-					fd.write(format(configElement.value * 90, "x"))
-			except:
-				BoxInfo.getItem("CanBTAudioDelay") = False
+			print("[AVSwitch] Write to /proc/stb/audio/btaudio_delay")
+			open("/proc/stb/audio/btaudio_delay", "w").write(format(configElement.value * 90))
 		config.av.btaudiodelay = ConfigSelectionNumber(-1000, 1000, 5, default=0)
 		config.av.btaudiodelay.addNotifier(setBTAudioDelay)
-
-	try:
-		BoxInfo.getItem("CanChangeOsdAlpha") = open("/proc/stb/video/alpha", "r") and True or False
-	except:
-		BoxInfo.getItem("CanChangeOsdAlpha") = False
+	else:
+		config.av.btaudiodelay = ConfigNothing()
 
 	if BoxInfo.getItem("CanChangeOsdAlpha"):
 		def setAlpha(config):
@@ -352,11 +346,11 @@ def InitAVSwitch():
 		def setScaler_sharpness(config):
 			myval = int(config.value)
 			try:
-				print "--> setting scaler_sharpness to: %0.8X" % myval
+				print("--> setting scaler_sharpness to: %0.8X" % myval)
 				open("/proc/stb/vmpeg/0/pep_scaler_sharpness", "w").write("%0.8X" % myval)
 				open("/proc/stb/vmpeg/0/pep_apply", "w").write("1")
 			except IOError:
-				print "[AVSwitch] couldn't write pep_scaler_sharpness"
+				print("[AVSwitch] couldn't write pep_scaler_sharpness")
 
 		config.av.scaler_sharpness = ConfigSlider(default=13, limits=(0, 26))
 		config.av.scaler_sharpness.addNotifier(setScaler_sharpness)
