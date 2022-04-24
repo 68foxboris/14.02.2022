@@ -329,18 +329,10 @@ def InitAVSwitch():
 
 	if BoxInfo.getItem("CanBTAudioDelay"):
 		def setBTAudioDelay(configElement):
-			try:
-				with open(BoxInfo.getItem("CanBTAudioDelay"), "w") as fd:
-					fd.write(format(configElement.value * 90, "x"))
-			except:
-				BoxInfo.getItem("CanBTAudioDelay") = False
+			print("[AVSwitch] Write to /proc/stb/audio/btaudio_delay")
+			open("/proc/stb/audio/btaudio_delay", "w").write(format(configElement.value * 90))
 		config.av.btaudiodelay = ConfigSelectionNumber(-1000, 1000, 5, default=0)
 		config.av.btaudiodelay.addNotifier(setBTAudioDelay)
-
-	try:
-		BoxInfo.getItem("CanChangeOsdAlpha") = open("/proc/stb/video/alpha", "r") and True or False
-	except:
-		BoxInfo.getItem("CanChangeOsdAlpha") = False
 
 	if BoxInfo.getItem("CanChangeOsdAlpha"):
 		def setAlpha(config):
@@ -352,11 +344,13 @@ def InitAVSwitch():
 		def setScaler_sharpness(config):
 			myval = int(config.value)
 			try:
-				print "--> setting scaler_sharpness to: %0.8X" % myval
+				print("--> setting scaler_sharpness to: %0.8X" % myval)
+				print("[AVSwitch] Write to /proc/stb/vmpeg/0/pep_scaler_sharpness")
 				open("/proc/stb/vmpeg/0/pep_scaler_sharpness", "w").write("%0.8X" % myval)
+				print("[AVSwitch] Write to /proc/stb/vmpeg/0/pep_apply")
 				open("/proc/stb/vmpeg/0/pep_apply", "w").write("1")
 			except IOError:
-				print "[AVSwitch] couldn't write pep_scaler_sharpness"
+				print("[AVSwitch] couldn't write pep_scaler_sharpness")
 
 		config.av.scaler_sharpness = ConfigSlider(default=13, limits=(0, 26))
 		config.av.scaler_sharpness.addNotifier(setScaler_sharpness)
@@ -376,11 +370,11 @@ def InitAVSwitch():
 
 	if BoxInfo.getItem("HasAutoVolumeLevel"):
 		def setAutoVolumeLevel(configElement):
-			open(SystemInfo["HasAutoVolumeLevel"], "w").write(configElement.value and "enabled" or "disabled")
+			open(BoxInfo.getItem("HasAutoVolumeLevel"), "w").write(configElement.value and "enabled" or "disabled")
 		config.av.autovolumelevel = ConfigYesNo(default=False)
 		config.av.autovolumelevel.addNotifier(setAutoVolumeLevel)
 
-	if SystemInfo["Has3DSurround"]:
+	if BoxInfo.getItem("Has3DSurround"):
 		def set3DSurround(configElement):
 			open(BoxInfo.getItem("Has3DSurround"), "w").write(configElement.value)
 		choices = [("none", _("off")), ("hdmi", _("HDMI")), ("spdif", _("SPDIF")), ("dac", _("DAC"))]
@@ -414,25 +408,6 @@ def InitAVSwitch():
 			open(BoxInfo.getItem("HDMIAudioSource"), "w").write(configElement.value)
 		config.av.hdmi_audio_source = ConfigSelection(default="pcm", choices=[("pcm", "PCM"), ("spdif", "SPDIF")])
 		config.av.hdmi_audio_source.addNotifier(setHDMIAudioSource)
-
-	if BoxInfo.getItem("CanBTAudio"):
-		def setBTAudio(configElement):
-			print("[AVSwitch] Write to /proc/stb/audio/btaudio")
-			open("/proc/stb/audio/btaudio", "w").write(configElement.value)
-		choice_list = [("off", _("off")), ("on", _("on"))]
-		config.av.btaudio = ConfigSelection(choices=choice_list, default="off")
-		config.av.btaudio.addNotifier(setBTAudio)
-	else:
-		config.av.btaudio = ConfigNothing()
-
-	if BoxInfo.getItem("CanBTAudioDelay"):
-		def setBTAudioDelay(configElement):
-			print("[AVSwitch] Write to /proc/stb/audio/btaudio_delay")
-			open("/proc/stb/audio/btaudio_delay", "w").write(format(configElement.value * 90))
-		config.av.btaudiodelay = ConfigSelectionNumber(-1000, 1000, 5, default=0)
-		config.av.btaudiodelay.addNotifier(setBTAudioDelay)
-	else:
-		config.av.btaudiodelay = ConfigNothing()
 
 	def setVolumeStepsize(configElement):
 		eDVBVolumecontrol.getInstance().setVolumeSteps(int(configElement.value))

@@ -12,7 +12,7 @@ from subprocess import PIPE, Popen
 
 from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl
 
-from Tools.Directories import SCOPE_LIBDIR, SCOPE_SKINS, fileCheck, fileContains, fileReadLine, fileReadLines, resolveFilename
+from Tools.Directories import SCOPE_LIBDIR, SCOPE_SKINS, fileCheck, fileContains, fileExists, fileReadLine, fileReadLines, resolveFilename
 
 MODULE_NAME = __name__.split(".")[-1]
 
@@ -281,7 +281,7 @@ SystemInfo["3DMode"] = fileCheck("/proc/stb/fb/3dmode") or fileCheck("/proc/stb/
 SystemInfo["3DZNorm"] = fileCheck("/proc/stb/fb/znorm") or fileCheck("/proc/stb/fb/primary/zoffset")
 SystemInfo["Blindscan_t2_available"] = brand == "vuplus"
 SystemInfo["HasFullHDSkinSupport"] = BoxInfo.getItem("fhdskin")
-SystemInfo["RcTypeChangable"] = not (model.startswith("et8500") or model.startswith("et7")) and pathExists("/proc/stb/ir/rc/type")
+SystemInfo["RcTypeChangable"] = not (model.startswith("et8500") or model.startswith("et7")) and fileAccess("/proc/stb/ir/rc/type")
 SystemInfo["HasBypassEdidChecking"] = fileCheck("/proc/stb/hdmi/bypass_edid_checking")
 SystemInfo["HasMMC"] = "root" in cmdline and cmdline["root"].startswith("/dev/mmcblk")
 SystemInfo["HasColorspace"] = fileCheck("/proc/stb/video/hdmi_colorspace")
@@ -296,7 +296,7 @@ SystemInfo["Has2160p"] = fileContains("/proc/stb/video/videomode_preferred", "21
 SystemInfo["HasHDMIpreemphasis"] = fileCheck("/proc/stb/hdmi/preemphasis")
 SystemInfo["HasColorimetry"] = fileCheck("/proc/stb/video/hdmi_colorimetry")
 SystemInfo["HasHdrType"] = fileCheck("/proc/stb/video/hdmi_hdrtype")
-SystemInfo["HasScaler_sharpness"] = fileContains("/proc/stb/vmpeg/0/pep_scaler_sharpness")
+SystemInfo["HasScaler_sharpness"] = fileCheck("/proc/stb/vmpeg/0/pep_scaler_sharpness")
 SystemInfo["HasHDMI"] = BoxInfo.getItem("hdmi")
 SystemInfo["HasHDMI-CEC"] = BoxInfo.getItem("HasHDMI") and (fileAccess("/dev/cec0") or fileAccess("/dev/hdmi_cec") or fileAccess("/dev/misc/hdmi_cec0"))
 SystemInfo["HasHDMIHDin"] = BoxInfo.getItem("hdmihdin")
@@ -322,22 +322,23 @@ SystemInfo["Has3DSurround"] = fileAccess("/proc/stb/audio/3d_surround_choices") 
 SystemInfo["Has3DSpeaker"] = fileAccess("/proc/stb/audio/3d_surround_speaker_position_choices") and fileCheck("/proc/stb/audio/3d_surround_speaker_position")
 SystemInfo["Has3DSurroundSpeaker"] = fileAccess("/proc/stb/audio/3dsurround_choices") and fileCheck("/proc/stb/audio/3dsurround")
 SystemInfo["Has3DSurroundSoftLimiter"] = fileAccess("/proc/stb/audio/3dsurround_softlimiter_choices") and fileCheck("/proc/stb/audio/3dsurround_softlimiter")
-SystemInfo["CanDownmixAC3"] = fileAccess("/proc/stb/audio/ac3_choices", "downmix")
-SystemInfo["CanDownmixDTS"] = fileAccess("/proc/stb/audio/dts_choices", "downmix")
-SystemInfo["CanDownmixAAC"] = fileAccess("/proc/stb/audio/aac_choices", "downmix")
+SystemInfo["CanDownmixAC3"] = fileContains("/proc/stb/audio/ac3_choices", "downmix")
+SystemInfo["CanDownmixDTS"] = fileContains("/proc/stb/audio/dts_choices", "downmix")
+SystemInfo["CanDownmixAAC"] = fileContains("/proc/stb/audio/aac_choices", "downmix")
 SystemInfo["HDMIAudioSource"] = fileCheck("/proc/stb/hdmi/audio_source")
-SystemInfo["CanAC3Transcode"] = fileAccess("/proc/stb/audio/ac3plus_choices", "force_ac3")
-SystemInfo["CanDTSHD"] = fileAccess("/proc/stb/audio/dtshd_choices", "downmix")
-SystemInfo["CanDownmixAACPlus"] = fileAccess("/proc/stb/audio/aacplus_choices", "downmix")
-SystemInfo["CanAACTranscode"] = fileAccess("/proc/stb/audio/aac_transcode_choices", "off")
-SystemInfo["CanWMAPRO"] = fileAccess("/proc/stb/audio/wmapro_choices", "downmix")
-SystemInfo["CanBTAudio"] = fileAccess("/proc/stb/audio/btaudio_choices", "off")
+SystemInfo["CanAC3Transcode"] = fileContains("/proc/stb/audio/ac3plus_choices", "force_ac3")
+SystemInfo["CanDTSHD"] = fileContains("/proc/stb/audio/dtshd_choices", "downmix")
+SystemInfo["CanDownmixAACPlus"] = fileContains("/proc/stb/audio/aacplus_choices", "downmix")
+SystemInfo["CanAACTranscode"] = fileContains("/proc/stb/audio/aac_transcode_choices", "off")
+SystemInfo["CanWMAPRO"] = fileContains("/proc/stb/audio/wmapro_choices", "downmix")
+SystemInfo["CanBTAudio"] = fileContains("/proc/stb/audio/btaudio_choices", "off")
 SystemInfo["CanBTAudioDelay"] = fileCheck("/proc/stb/audio/btaudio_delay") or fileCheck("/proc/stb/audio/btaudio_delay_pcm")
 SystemInfo["BootDevice"] = getBootdevice()
 SystemInfo["FbcTunerPowerAlwaysOn"] = model in ("vusolo4k", "vuduo4k", "vuduo4kse", "vuultimo4k", "vuuno4k", "vuuno4kse", "gbquad4k", "gbue4k")
 SystemInfo["HasPhysicalLoopthrough"] = ["Vuplus DVB-S NIM(AVL2108)", "GIGA DVB-S2 NIM (Internal)"]
 SystemInfo["HasFBCtuner"] = ["Vuplus DVB-C NIM(BCM3158)", "Vuplus DVB-C NIM(BCM3148)", "Vuplus DVB-S NIM(7376 FBC)", "Vuplus DVB-S NIM(45308X FBC)", "Vuplus DVB-S NIM(45208 FBC)", "DVB-S NIM(45208 FBC)", "DVB-S2X NIM(45308X FBC)", "DVB-S2 NIM(45308 FBC)", "DVB-C NIM(3128 FBC)", "BCM45208", "BCM45308X", "BCM3158"]
-SystemInfo["HasHiSi"] = pathExists("/proc/hisi")
+SystemInfo["CanChangeOsdAlpha"] = access("/proc/stb/video/alpha", R_OK) and True or False
+SystemInfo["HasHiSi"] = fileAccess("/proc/hisi")
 SystemInfo["FCCactive"] = False
 SystemInfo["OScamInstalled"] = fileExists("/usr/bin/oscam") or fileExists("/usr/bin/oscam-emu") or fileExists("/usr/bin/oscam-smod")
 SystemInfo["OScamIsActive"] = BoxInfo.getItem("OScamInstalled") and fileExists("/tmp/.oscam/oscam.version")
@@ -355,6 +356,11 @@ SystemInfo["CanWMAPRO"] = fileExists("/proc/stb/audio/wmapro")
 SystemInfo["CanDownmixAACPlus"] = fileExists("/proc/stb/audio/aacplus_choices")
 SystemInfo["CanAACTranscode"] = fileExists("/proc/stb/audio/aac_transcode_choices")
 SystemInfo["CanSyncMode"] = fileExists("/proc/stb/video/sync_mode_choices")
+SystemInfo["7segment"] = displaytype == "7segment" or "7seg" in displaytype
+SystemInfo["GraphicLCD"] = model in ("vuultimo", "xpeedlx3", "et10000", "hd2400", "sezammarvel", "atemionemesis", "mbultra", "beyonwizt4", "osmio4kplus")
+SystemInfo["LCDMiniTVPiP"] = BoxInfo.getItem("LCDMiniTV") and model not in ("gb800ueplus", "gbquad4k", "gbue4k")
+SystemInfo["DefaultDisplayBrightness"] = platform == "dm4kgen" and 8 or 5
+SystemInfo["ConfigDisplay"] = BoxInfo.getItem("FrontpanelDisplay") and displaytype != "7segment" and "7seg" not in displaytype
 SystemInfo["DreamBoxAudio"] = platform in ("dm4kgen", "dmamlogic") or model in ("dm7080", "dm800")
 SystemInfo["VFDDelay"] = model in ("sf4008", "beyonwizu4")
 SystemInfo["VFDRepeats"] = brand != "ixuss" and displaytype != "7segment" and "7seg" not in displaytype
