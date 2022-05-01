@@ -673,10 +673,6 @@ profile("Init:DebugLogCheck")
 import Screens.LogManager
 Screens.LogManager.AutoLogManager()
 
-profile("Init:NTPSync")
-from Components.NetworkTime import ntpSyncPoller
-ntpSyncPoller.startTimer()
-
 profile("keymapparser")
 import keymapparser
 keymapparser.readKeymap(config.usage.keymap.value)
